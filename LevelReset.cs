@@ -1,3 +1,6 @@
+//Loads the next scene, currently set to do so when game object it is attached to is collided with, although LoadNextLevel
+//can be used for UI etc.
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,19 +17,7 @@ public class LevelReset : MonoBehaviour
     
     void OnCollisionEnter()
     {
-        LoadNextLevel();
-        
+        LoadNextLevel(); 
     }
     
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
