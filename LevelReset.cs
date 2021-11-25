@@ -10,14 +10,14 @@ using UnityEngine.SceneManagement;
 public class LevelReset : MonoBehaviour
 {
     
-    public void LoadNextLevel()
+    public void ReLoad()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
     
     void OnCollisionEnter()
     {
-        LoadNextLevel(); 
+        ReLoad(); 
     }
     
 }
