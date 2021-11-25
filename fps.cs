@@ -1,13 +1,15 @@
+//Handles HUD, tells player FPS, Speed and whether they can shoot an explosive or not
+
 using UnityEngine;
 using UnityEngine.UI;
  
 public class fps : MonoBehaviour
 {
+    //public MeshRenderer EnableShootTell;
     public GameObject FPSCAM;
     private MouseLook Mlook;
     public int avgFrameRate;
     public float ShowSpeed;
-    public MeshRenderer EnableShootTell;
     public Text ShootTell;
     public Text display_Text;
     public Text SpeedText;
@@ -16,28 +18,27 @@ public class fps : MonoBehaviour
     
     public void Start ()
     {
-        Mlook = FPSCAM.GetComponent<MouseLook>();
-        //GetComponent(MeshRenderer).enabled = false;
+        Mlook = FPSCAM.GetComponent<MouseLook>(); //References canShoot from MouseLook for use
     }
     public void Update ()
     {
-        //Mlook.canShoot
+        
         float current = 0;
-        float ShowSpeed = player.velocity.magnitude;
-        current = (int)(1f / Time.unscaledDeltaTime);
+        float ShowSpeed = player.velocity.magnitude; //Gets Speed
+        current = (int)(1f / Time.unscaledDeltaTime); //Gets FPS
         avgFrameRate = (int)current;
         display_Text.text = avgFrameRate.ToString() + " FPS ";
         SpeedText.text = ShowSpeed.ToString();
         if (!Mlook.canShoot)
         {
-            //EnableShootTell.enabled = false;
+            //EnableShootTell.enabled = false;(usable if using an icon)
             TellMePls = "No";
         }
         else
         {
-            //EnableShootTell.enabled = true;
+            //EnableShootTell.enabled = true;(usable if using an icon)
             TellMePls = "Yes";
         }
-        ShootTell.text = TellMePls;
+        ShootTell.text = TellMePls; //Displays the current status of TellMePls
     }
 }
