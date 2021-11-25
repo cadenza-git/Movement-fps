@@ -1,3 +1,5 @@
+//Handles input in relation to moving the Player around
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,7 +41,7 @@ public class NewBehaviourScript : MonoBehaviour
         CurrSpeed = rb.velocity.magnitude;
         SpeedLock = (MaxSpeed - CurrSpeed)/MaxSpeed; //Makes it so that if they player is travelling faster than
         //a specific limit, the effect they have in game is lessened, in a way that soft caps the player, instead of a
-        //harsh limit
+        //harsh limit. took me more time than average to derive so i guess im proud or somt idk
         
         if (Input.GetKey("escape"))
         {
