@@ -7,7 +7,7 @@ using UnityEngine;
 public class MouseLook : MonoBehaviour
 {
     
-    public Transform playerBody;    //Reference to transform of the player "collider"
+    public Transform playerBody;    //Reference to transform of the player "collider", for later use in movement
     public float mouseSensitivity = 100.0f; //sens
     public float clampAngle = 87.5f;    //clamp so that player can look further than clampAngle degrees
     private float rotY = 0.0f; 
