@@ -1,5 +1,5 @@
 //Loads the next scene, currently set to do so when game object it is attached to is collided with, although LoadNextLevel
-//can be used for UI etc.
+//can be used for UI etc
 
 using System.Collections;
 using System.Collections.Generic;
