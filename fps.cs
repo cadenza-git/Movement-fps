@@ -18,7 +18,7 @@ public class fps : MonoBehaviour
     
     public void Start ()
     {
-        Mlook = FPSCAM.GetComponent<MouseLook>(); //References canShoot from MouseLook for use
+        Mlook = FPSCAM.GetComponent<MouseLook>(); //References canShoot from MouseLook for use.
     }
     public void Update ()
     {
