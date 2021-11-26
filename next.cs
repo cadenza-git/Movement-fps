@@ -1,4 +1,4 @@
-//Loads next level
+//Loads next level.
 
 using System.Collections;
 using System.Collections.Generic;
