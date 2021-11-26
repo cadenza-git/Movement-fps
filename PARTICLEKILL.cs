@@ -1,4 +1,4 @@
-//Attaches to Particle system which is instantiated, kills it after end of play,, so that scene doesn't become laggy
+//Attaches to Particle system which is instantiated, kills it after end of play,, so that scene doesn't become laggy.
 
 using UnityEngine;
 using System.Collections;
