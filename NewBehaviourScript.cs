@@ -1,4 +1,4 @@
-//Handles input in relation to moving the Player around
+//Handles input in relation to moving the Player around.
 
 using System.Collections;
 using System.Collections.Generic;
