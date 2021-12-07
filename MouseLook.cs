@@ -90,6 +90,23 @@ public class MouseLook : MonoBehaviour
               
         }
         
+        if (Input.GetKey(KeyCode.E))
+        {
+            RaycastHit hit = CastRay();
+            if (hit.distance<5 && hit.collider.name == "Cube") //basic interactable, only applies to certain objects which are defined
+            {
+                //if()
+                {    
+                    
+                }    
+                //else
+                {
+                    
+                    
+                }
+            }
+        }
+        
         if (Input.GetKey(KeyCode.Mouse1) && canShoot)
         {
             SpawnBoom();
