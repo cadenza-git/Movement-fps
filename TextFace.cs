@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class TextFace : MonoBehaviour
 {
-    // Start is called before the first frame update
-    public Transform Player;
+    
+    public Transform Player; // Reference of the player
 
-    // Update is called once per frame
+    
     void Update()
     {
         transform.LookAt(Player);
-        transform.Rotate(0,180,0);
+        transform.Rotate(0,180,0); // Otherwise the text looks the other way
     }
 }
