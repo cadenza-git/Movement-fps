@@ -17,6 +17,9 @@ public class NewBehaviourScript : MonoBehaviour
     public float CrouchSpeed = 1f;
     public float MaxSpeed = 50f;
     public float CurrSpeed;
+    public int life = 10;
+    public Light light;
+    private Color newColor = new Color(0.4179907f,0.2104842f,0.8113208f, 1f);
     private float SpeedLock;
     private float StrafeSpeedNeuter;
     public Rigidbody rb;
@@ -28,20 +31,48 @@ public class NewBehaviourScript : MonoBehaviour
     {
         //This form of testing to see if the player can jump is pretty terrible, may change in the future
         JumpAbility = true;
+        if(collision.relativeVelocity.y > 32.5 )//basic fall damage
+        {
+            life--;
+        }
     }
     
     void Start()
     {
         
         rb = GetComponent<Rigidbody>();
+        light.color = newColor;
         
     }
     void Update()
-    {
+    {switch(life)
+        {
+            case 2:
+                light.color= Color.red;
+                break;
+            case 4:
+                light.color= Color.cyan;
+                break;
+            case 6:
+                light.color= Color.blue;
+                break;
+            case 8:
+                light.color= Color.magenta;
+                break;
+        }
+            
+            
+        if(life<=0)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        
+        
         CurrSpeed = rb.velocity.magnitude;
         SpeedLock = (MaxSpeed - CurrSpeed)/MaxSpeed; //Makes it so that if they player is travelling faster than
         //a specific limit, the effect they have in game is lessened, in a way that soft caps the player, instead of a
         //harsh limit. took me more time than average to derive so i guess im proud or somt idk
+        SpeedLock = Mathf.Clamp(SpeedLock, 0, 100); //If you go above the top speed it returns a negative float with no cap
         
         if (Input.GetKey("escape"))
         {
