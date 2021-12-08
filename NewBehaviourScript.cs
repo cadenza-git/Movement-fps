@@ -17,7 +17,7 @@ public class NewBehaviourScript : MonoBehaviour
     public float CrouchSpeed = 1f;
     public float MaxSpeed = 50f;
     public float CurrSpeed;
-    public int life = 10;
+    public int life = 100;
     public Light light;
     private Color newColor = new Color(0.4179907f,0.2104842f,0.8113208f, 1f);
     private float SpeedLock;
@@ -33,7 +33,9 @@ public class NewBehaviourScript : MonoBehaviour
         JumpAbility = true;
         if(collision.relativeVelocity.y > 32.5 )//basic fall damage
         {
-            life--;
+            FallDamage = (int)(2*(collision.relativeVelocity.y-33f));
+            
+            life = life-FallDamage;
         }
     }
     
@@ -45,18 +47,20 @@ public class NewBehaviourScript : MonoBehaviour
         
     }
     void Update()
-    {switch(life)
+    {
+    
+        switch(life)
         {
-            case 2:
+            case int n when (n <= 20):
                 light.color= Color.red;
                 break;
-            case 4:
+            case int n when (n <= 40 && n <= 21):
                 light.color= Color.cyan;
                 break;
-            case 6:
+            case int n when (n <= 60 && n <= 41):
                 light.color= Color.blue;
                 break;
-            case 8:
+            case int n when (n <= 80 && n <= 61):
                 light.color= Color.magenta;
                 break;
         }
