@@ -7,6 +7,7 @@ using UnityEngine;
 public class MouseLook : MonoBehaviour
 {
     
+    public AudioSource shot; //reference audio to play
     public Transform playerBody;    //Reference to transform of the player "collider", for later use in movement
     public float mouseSensitivity = 100.0f; //sens
     public float clampAngle = 87.5f;    //clamp so that player can look further than clampAngle degrees
@@ -87,7 +88,10 @@ public class MouseLook : MonoBehaviour
         if (Input.GetKey(KeyCode.Mouse0))
         {
             Instantiate(Particle, CastRay().point, Quaternion.Euler(270,0,0));
-              
+            if (!shot.isPlaying)
+            {
+            	shot.Play(); //plays only when isnt already playing
+            } 
         }
         
         if (Input.GetKey(KeyCode.E))
