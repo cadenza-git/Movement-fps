@@ -6,7 +6,9 @@ using UnityEngine;
 
 public class NewBehaviourScript : MonoBehaviour
 {
-    
+    public AudioSource Feets;
+    public AudioSource Fall;
+    public AudioSource Jump; //^all audio sound effects to be used
     public bool JumpAbility = false;
     public float strafe = 50f;
     public float Forward = 75f;
@@ -23,6 +25,7 @@ public class NewBehaviourScript : MonoBehaviour
     private float SpeedLock;
     private float StrafeSpeedNeuter;
     public Rigidbody rb;
+    private int FallDamage;
     
     
     
@@ -31,23 +34,33 @@ public class NewBehaviourScript : MonoBehaviour
     {
         //This form of testing to see if the player can jump is pretty terrible, may change in the future
         JumpAbility = true;
-        if(collision.relativeVelocity.y > 32.5 )//basic fall damage
+        if(collision.relativeVelocity.y > 32.5 )
         {
             FallDamage = (int)(2*(collision.relativeVelocity.y-33f));
-            
+            Fall.Play();//Plays the fall damage effect
             life = life-FallDamage;
         }
     }
     
     void Start()
     {
-        
+        Feets.Play(); //plays from start as player is touching ground at start
         rb = GetComponent<Rigidbody>();
         light.color = newColor;
         
     }
     void Update()
     {
+        CurrSpeed = rb.velocity.magnitude;
+        SpeedLock = (MaxSpeed - CurrSpeed)/MaxSpeed; //Makes it so that if they player is travelling faster than
+        //a specific limit, the effect they have in game is lessened, in a way that soft caps the player, instead of a
+        //harsh limit. took me more time than average to derive so i guess im proud or somt idk
+        SpeedLock = Mathf.Clamp(SpeedLock, 0, 100); //If you go above the top speed it returns a negative float with no cap
+        Feets.volume = 1-SpeedLock; // volume is analogous with speed, so volume feels natural
+        if(!JumpAbility)
+        {
+            Feets.volume = 0; //if in air turns it off
+        }
     
         switch(life)
         {
@@ -72,12 +85,6 @@ public class NewBehaviourScript : MonoBehaviour
         }
         
         
-        CurrSpeed = rb.velocity.magnitude;
-        SpeedLock = (MaxSpeed - CurrSpeed)/MaxSpeed; //Makes it so that if they player is travelling faster than
-        //a specific limit, the effect they have in game is lessened, in a way that soft caps the player, instead of a
-        //harsh limit. took me more time than average to derive so i guess im proud or somt idk
-        SpeedLock = Mathf.Clamp(SpeedLock, 0, 100); //If you go above the top speed it returns a negative float with no cap
-        
         if (Input.GetKey("escape"))
         {
             Application.Quit(); //closes game when built
@@ -85,6 +92,7 @@ public class NewBehaviourScript : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && JumpAbility == true) //Done in update due to clashes with other inputs 
         {
             rb.AddForce(0, Jumping, 0* Time.deltaTime);
+            Jump.Play(); //Plays Jump
             JumpAbility = false;
         }
         if (Input.GetKey(KeyCode.LeftShift))    //Slows player down when crouching
