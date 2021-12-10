@@ -23,6 +23,12 @@ public class MouseLook : MonoBehaviour
     public Rigidbody Reginald;
     public GameObject Particle;
     public GameObject BoomParticle;
+    public int EnemyLife = 10;
+    public GameObject Enemy;
+    public GameObject NewEnemy;
+    private bool HasKilled;
+    public RaycastHit shit;
+    public string HitName;
     
     void Start()
     {
@@ -37,6 +43,14 @@ public class MouseLook : MonoBehaviour
     {
         //Make it so that can only "shoot" in periods
         canShoot = true;
+    }
+    void SpawnEnemy()
+    {
+        
+        EnemyLife = 10;
+        Instantiate(NewEnemy, new Vector3(47.85f, -7.45f, -32.56f),  Quaternion.identity);
+        Enemy = GameObject.Find("Capsule(Clone)");
+        
     }
     void SpawnBoom()
     {
@@ -62,10 +76,17 @@ public class MouseLook : MonoBehaviour
         {
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 1000, Color.white);
             
-        }
+        }//helps in editor
     }
     void Update()
     {
+        if (EnemyLife <= 0 && !HasKilled)
+        {
+            Destroy(Enemy);
+            HasKilled = true;
+            
+        }
+        
         if (!Input.GetKey(KeyCode.LeftShift))   //attempt at implementation of shift-to-rocketjump from source in unity
         {
             BoomModifier = 1.0f;
@@ -83,24 +104,46 @@ public class MouseLook : MonoBehaviour
         transform.rotation = localRotation;
         Vector3 eulerRotation = new Vector3(playerBody.transform.eulerAngles.x, transform.eulerAngles.y, playerBody.transform.eulerAngles.z );
         //^This applies the y rotation to the player so that forces can be applied in same direction as camera
-        
         playerBody.rotation = Quaternion.Euler(eulerRotation);
+        
+        
         if (Input.GetKey(KeyCode.Mouse0))
         {
-            Instantiate(Particle, CastRay().point, Quaternion.Euler(270,0,0));
+            shotHit = CastRay();
+            HitName = shotHit.collider.name;
             if (!shot.isPlaying)
             {
-            	shot.Play(); //plays only when isnt already playing
+            	shot.Play();
+            }
+            Instantiate(Particle, shit.point, Quaternion.identity);
+            
+            if (shotHit.rigidbody != null)
+            {
+                shotHit.rigidbody.AddForce(0,20000,0);
+            }
+            
+            
+            
+            if (HitName == "Capsule(Clone)")
+            {
+                EnemyLife--;
+            }
+            else if(HitName == "Head")
+            {
+                EnemyLife = EnemyLife-3;
             } 
         }
         
         if (Input.GetKey(KeyCode.E))
         {
             RaycastHit hit = CastRay();
-            if (hit.distance<5 && hit.collider.name == "Cube") //basic interactable, only applies to certain objects which are defined
+            if (hit.distance<5 && hit.collider.name == "Interacube")//arbitrary name
             {
-                //if()
-                {    
+                Debug.Log("Interacted");
+                if(HasKilled)
+                {
+                    SpawnEnemy();
+                    HasKilled = false;
                     
                 }    
                 //else
