@@ -29,6 +29,7 @@ public class MouseLook : MonoBehaviour
     private bool HasKilled;
     public RaycastHit shit;
     public string HitName;
+    public Animator Gun;
     
     void Start()
     {
@@ -122,13 +123,16 @@ public class MouseLook : MonoBehaviour
                 shotHit.rigidbody.AddForce(0,20000,0);
             }
             
-            
+            if (Gun != null)
+            {
+                Gun.Play("Base Layer.Yes",0,0); //plays recoil animation
+            }
             
             if (HitName == "Capsule(Clone)")
             {
                 EnemyLife--;
             }
-            else if(HitName == "Head")
+            else if(HitName == "Head") //headshots
             {
                 EnemyLife = EnemyLife-3;
             } 
