@@ -5,4 +5,4 @@ Working on implementing UI.
 Base code very disorganised, may organise at a later date
 
 Currently:
-  Making it look nice (no scripting)
+  Implementing different features that could be considered cool maybe
