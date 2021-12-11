@@ -27,7 +27,7 @@ public class MouseLook : MonoBehaviour
     public GameObject Enemy;
     public GameObject NewEnemy;
     private bool HasKilled;
-    public RaycastHit shot;
+    public RaycastHit Shot;
     public string HitName;
     public Animator Gun;
     public int Clips = 8;
@@ -115,11 +115,11 @@ public class MouseLook : MonoBehaviour
             if (Gun != null && Bullets > 0)
             {  
                 
-                shot = CastRay();
-                ShotName = shot.collider.name;
+                Shot = CastRay();
+                ShotName = Shot.collider.name;
                 Gun.Play("Base Layer.Yes",0,0);
                 Bullets--;
-                Instantiate(Particle, shit.point, Quaternion.identity);
+                Instantiate(Particle, Shot.point, Quaternion.identity);
                 if (!shot.isPlaying)
                 {
                     shot.Play();
@@ -132,16 +132,16 @@ public class MouseLook : MonoBehaviour
                 {
                     EnemyLife = EnemyLife-4;
                 }
-                if (shot.rigidbody != null)
+                if (Shot.rigidbody != null)
                 {
                     shot.rigidbody.AddForce(0,20000,0);
-                }   if (Input.GetKeyDown(KeyCode.R) && !(Gun.GetCurrentAnimatorStateInfo(0).IsName("reload")) && Clips > 0)
-        {
-            Gun.Play("Base Layer.reload",0,0);
-            Clips--;
-            Bullets = 10;
-        }
-        
+                }   
+                if (Input.GetKeyDown(KeyCode.R) && !(Gun.GetCurrentAnimatorStateInfo(0).IsName("reload")) && Clips > 0)
+                {
+                    Gun.Play("Base Layer.reload",0,0);
+                    Clips--;
+                    Bullets = 10;
+                }
             }
         }
         
