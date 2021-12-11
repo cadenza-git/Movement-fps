@@ -17,6 +17,8 @@ public class fps : MonoBehaviour
     private string TellMePls;
     private float start = 0.01f;
     private float period = 0.1f;
+    public string Clips;
+    public string Bullets;
     
     public void Start ()
     {
@@ -39,10 +41,16 @@ public class fps : MonoBehaviour
         SpeedText.text = IntSpeed.ToString();
     }
     
-    public void FixedUpdate ()
+    public void Update ()
     {
         
-        LifeText.text = LifeScript.life.ToString; //displays how much "life" is left
+        Clips = Mlook.Clips.ToString();
+        Bullets = Mlook.Bullets.ToString();
+        
+        //Mlook.canShoot
+        BulletText.text = Bullets + "/";
+        ClipText.text = Clips; //displays
+        LifeText.text = LifeScript.life.ToString(); //displays how much "life" is left
         if (!Mlook.canShoot)
         {
             //EnableShootTell.enabled = false;(usable if using an icon)
