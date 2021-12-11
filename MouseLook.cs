@@ -27,9 +27,11 @@ public class MouseLook : MonoBehaviour
     public GameObject Enemy;
     public GameObject NewEnemy;
     private bool HasKilled;
-    public RaycastHit shit;
+    public RaycastHit shot;
     public string HitName;
     public Animator Gun;
+    public int Clips = 8;
+    public int Bullets = 10;
     
     void Start()
     {
@@ -81,6 +83,10 @@ public class MouseLook : MonoBehaviour
     }
     void Update()
     {
+        if (Input.GetKey(KeyCode.Mouse3))
+        {
+            Debug.Log("2 pressed");
+        }
         if (EnemyLife <= 0 && !HasKilled)
         {
             Destroy(Enemy);
@@ -96,46 +102,47 @@ public class MouseLook : MonoBehaviour
         {
             BoomModifier = 1.75f;
         }
-        float mouseX = Input.GetAxis("Mouse X");    //Gets mouse input
-        float mouseY = -Input.GetAxis("Mouse Y");
-        rotY += mouseX * mouseSensitivity * Time.deltaTime; //Can use mouse input to affect camera  
-        rotX += mouseY * mouseSensitivity * Time.deltaTime; 
-        rotX = Mathf.Clamp(rotX, -clampAngle, clampAngle);  //Applies the clamping 
-        Quaternion localRotation = Quaternion.Euler(rotX, rotY, 0.0f); //Applies rotation to camera
-        transform.rotation = localRotation;
-        Vector3 eulerRotation = new Vector3(playerBody.transform.eulerAngles.x, transform.eulerAngles.y, playerBody.transform.eulerAngles.z );
-        //^This applies the y rotation to the player so that forces can be applied in same direction as camera
-        playerBody.rotation = Quaternion.Euler(eulerRotation);
         
+        if (Input.GetKeyDown(KeyCode.R) && !(Gun.GetCurrentAnimatorStateInfo(0).IsName("reload")) && Clips > 0)
+        {
+            Gun.Play("Base Layer.reload",0,0);
+            Clips--;
+            Bullets = 10;
+        }
         
         if (Input.GetKey(KeyCode.Mouse0))
         {
-            shotHit = CastRay();
-            HitName = shotHit.collider.name;
-            if (!shot.isPlaying)
-            {
-            	shot.Play();
+            if (Gun != null && Bullets > 0)
+            {  
+                
+                shot = CastRay();
+                ShotName = shot.collider.name;
+                Gun.Play("Base Layer.Yes",0,0);
+                Bullets--;
+                Instantiate(Particle, shit.point, Quaternion.identity);
+                if (!shot.isPlaying)
+                {
+                    shot.Play();
+                }
+                if (ShotName == "Capsule(Clone)")
+                {   
+                    EnemyLife--;
+                }
+                else if(ShotName == "Head")
+                {
+                    EnemyLife = EnemyLife-4;
+                }
+                if (shot.rigidbody != null)
+                {
+                    shot.rigidbody.AddForce(0,20000,0);
+                }   if (Input.GetKeyDown(KeyCode.R) && !(Gun.GetCurrentAnimatorStateInfo(0).IsName("reload")) && Clips > 0)
+        {
+            Gun.Play("Base Layer.reload",0,0);
+            Clips--;
+            Bullets = 10;
+        }
+        
             }
-            Instantiate(Particle, shit.point, Quaternion.identity);
-            
-            if (shotHit.rigidbody != null)
-            {
-                shotHit.rigidbody.AddForce(0,20000,0);
-            }
-            
-            if (Gun != null)
-            {
-                Gun.Play("Base Layer.Yes",0,0); //plays recoil animation
-            }
-            
-            if (HitName == "Capsule(Clone)")
-            {
-                EnemyLife--;
-            }
-            else if(HitName == "Head") //headshots
-            {
-                EnemyLife = EnemyLife-3;
-            } 
         }
         
         if (Input.GetKey(KeyCode.E))
@@ -165,5 +172,16 @@ public class MouseLook : MonoBehaviour
             Invoke("CooledDown", coolDown);
             //"Rocket Jumping" can only shoot every specific time period
         }
+        
+        float mouseX = Input.GetAxis("Mouse X");    //Gets mouse input
+        float mouseY = -Input.GetAxis("Mouse Y");
+        rotY += mouseX * mouseSensitivity * Time.deltaTime; //Can use mouse input to affect camera  
+        rotX += mouseY * mouseSensitivity * Time.deltaTime; 
+        rotX = Mathf.Clamp(rotX, -clampAngle, clampAngle);  //Applies the clamping 
+        Quaternion localRotation = Quaternion.Euler(rotX, rotY, 0.0f); //Applies rotation to camera
+        transform.rotation = localRotation;
+        Vector3 eulerRotation = new Vector3(playerBody.transform.eulerAngles.x, transform.eulerAngles.y, playerBody.transform.eulerAngles.z );
+        //^This applies the y rotation to the player so that forces can be applied in same direction as camera
+        playerBody.rotation = Quaternion.Euler(eulerRotation);
     }
 }
