@@ -28,7 +28,7 @@ public class MouseLook : MonoBehaviour
     public GameObject NewEnemy;
     private bool HasKilled;
     public RaycastHit Shot;
-    public string HitName;
+    public string ShotName;
     public Animator Gun;
     public int Clips = 8;
     public int Bullets = 10;
@@ -83,6 +83,10 @@ public class MouseLook : MonoBehaviour
     }
     void Update()
     {
+        if (Input.GetKey(KeyCode.V))
+        {
+            Clips = 8;
+        }
         if (Input.GetKey(KeyCode.Mouse3))
         {
             Debug.Log("2 pressed");
@@ -110,7 +114,7 @@ public class MouseLook : MonoBehaviour
             Bullets = 10;
         }
         
-        if (Input.GetKey(KeyCode.Mouse0))
+        if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             if (Gun != null && Bullets > 0)
             {  
@@ -134,6 +138,7 @@ public class MouseLook : MonoBehaviour
                 }
                 if (Shot.rigidbody != null)
                 {
+                    shot.rigidbody.AddForce(0,20000,0);
                     shot.rigidbody.AddForce(0,20000,0);
                 }   
                 if (Input.GetKeyDown(KeyCode.R) && !(Gun.GetCurrentAnimatorStateInfo(0).IsName("reload")) && Clips > 0)
@@ -185,3 +190,4 @@ public class MouseLook : MonoBehaviour
         playerBody.rotation = Quaternion.Euler(eulerRotation);
     }
 }
+
