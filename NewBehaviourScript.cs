@@ -1,15 +1,16 @@
-//Handles input in relation to moving the Player around.
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NewBehaviourScript : MonoBehaviour
 {
+    public GameObject CheckSphere;
+    private JumpDetect TellJump;
     public AudioSource Feets;
     public AudioSource Fall;
-    public AudioSource Jump; //^all audio sound effects to be used
-    public bool JumpAbility = false;
+    public AudioSource Jump;
+    public bool JumpAbility = true;
     public float strafe = 50f;
     public float Forward = 75f;
     public float Jumping = 1000f;
@@ -26,42 +27,47 @@ public class NewBehaviourScript : MonoBehaviour
     private float StrafeSpeedNeuter;
     public Rigidbody rb;
     private int FallDamage;
+    private bool HasTurnedOff;
     
-    
+    //CharacterController characterController;
     
     
     private void OnCollisionEnter(Collision collision)
     {
-        //This form of testing to see if the player can jump is pretty terrible, may change in the future
-        JumpAbility = true;
+        
         if(collision.relativeVelocity.y > 32.5 )
         {
             FallDamage = (int)(2*(collision.relativeVelocity.y-33f));
-            Fall.Play();//Plays the fall damage effect
+            Fall.Play();
             life = life-FallDamage;
         }
     }
     
     void Start()
     {
-        Feets.Play(); //plays from start as player is touching ground at start
+        TellJump = CheckSphere.GetComponent<JumpDetect>(); //references the current collision status
+        Feets.Play();
+        
         rb = GetComponent<Rigidbody>();
         light.color = newColor;
         
     }
     void Update()
     {
+        JumpAbility = TellJump.CanJump;
+        
+        //t += 1f * Time.deltaTime;
         CurrSpeed = rb.velocity.magnitude;
-        SpeedLock = (MaxSpeed - CurrSpeed)/MaxSpeed; //Makes it so that if they player is travelling faster than
-        //a specific limit, the effect they have in game is lessened, in a way that soft caps the player, instead of a
-        //harsh limit. took me more time than average to derive so i guess im proud or somt idk
-        SpeedLock = Mathf.Clamp(SpeedLock, 0, 100); //If you go above the top speed it returns a negative float with no cap
-        Feets.volume = 1-SpeedLock; // volume is analogous with speed, so volume feels natural
+        SpeedLock = (MaxSpeed - CurrSpeed)/MaxSpeed;
+        SpeedLock = Mathf.Clamp(SpeedLock, 0, 100);
+        Feets.volume = 1-SpeedLock;
         if(!JumpAbility)
         {
-            Feets.volume = 0; //if in air turns it off
+            Feets.volume = 0;
         }
-    
+        
+        
+        
         switch(life)
         {
             case int n when (n <= 20):
@@ -84,18 +90,17 @@ public class NewBehaviourScript : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
         
-        
         if (Input.GetKey("escape"))
         {
-            Application.Quit(); //closes game when built
+            Application.Quit();
         }
-        if (Input.GetKeyDown(KeyCode.Space) && JumpAbility == true) //Done in update due to clashes with other inputs 
+        if (Input.GetKeyDown(KeyCode.Space) && JumpAbility == true)
         {
             rb.AddForce(0, Jumping, 0* Time.deltaTime);
-            Jump.Play(); //Plays Jump
+            Jump.Play();
             JumpAbility = false;
         }
-        if (Input.GetKey(KeyCode.LeftShift))    //Slows player down when crouching
+        if (Input.GetKey(KeyCode.LeftShift))
         {
             CrouchSpeed = 0.4f;
         }
@@ -104,11 +109,12 @@ public class NewBehaviourScript : MonoBehaviour
             CrouchSpeed = 1f;
         }
     }
-    
+    // Update is called once per frame
     void FixedUpdate()
     {
         
-        if (JumpAbility != true)    //Player has less maneouverability in the air, but strafing is still relatively stron (source)
+        
+        if (JumpAbility != true)
         {
             AirSpeedNeuter = 0.25f;
             StrafeSpeedNeuter = 0.8f;
@@ -142,12 +148,12 @@ public class NewBehaviourScript : MonoBehaviour
             rb.AddRelativeForce(strafe * StrafeSpeedNeuter * SpeedLock * CrouchSpeed,0,0 * Time.deltaTime);
             
         }
-        if (Input.GetKey(KeyCode.LeftShift))    //Gives the player more maneouverability, as crouch also pushes down
+        if (Input.GetKey(KeyCode.LeftShift))
         {
             rb.AddRelativeForce(0,-CrouchDown,0);
         }
         
-        rb.AddForce(0,-Gravity,0);  //Player falls faster and jumping feels more realisitic
-        
+        rb.AddForce(0,-Gravity,0);
+        //rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
     }
 }
