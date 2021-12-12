@@ -1,5 +1,3 @@
-//handles Looking and Shooting, instantiates different things etc
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -136,11 +134,10 @@ public class MouseLook : MonoBehaviour
                 {
                     EnemyLife = EnemyLife-4;
                 }
-                if (Shot.rigidbody != null)
-                {
-                    shot.rigidbody.AddForce(0,20000,0);
-                    shot.rigidbody.AddForce(0,20000,0);
-                }   
+                //if (Shot.rigidbody != null)
+                //{
+                    //shot.AddForce(0,20000,0);
+                //}   
                 if (Input.GetKeyDown(KeyCode.R) && !(Gun.GetCurrentAnimatorStateInfo(0).IsName("reload")) && Clips > 0)
                 {
                     Gun.Play("Base Layer.reload",0,0);
@@ -190,4 +187,3 @@ public class MouseLook : MonoBehaviour
         playerBody.rotation = Quaternion.Euler(eulerRotation);
     }
 }
-
