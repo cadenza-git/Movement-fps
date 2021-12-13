@@ -7,6 +7,8 @@ public class MouseLook : MonoBehaviour
     
     public AudioSource shot; //reference audio to play
     public Transform playerBody;    //Reference to transform of the player "collider", for later use in movement
+    public Animator VaultDoor;
+    public AudioSource DoorOpens;
     public float mouseSensitivity = 100.0f; //sens
     public float clampAngle = 87.5f;    //clamp so that player can look further than clampAngle degrees
     private float rotY = 0.0f; 
@@ -30,6 +32,7 @@ public class MouseLook : MonoBehaviour
     public Animator Gun;
     public int Clips = 8;
     public int Bullets = 10;
+    public Collider Pass;
     
     void Start()
     {
@@ -93,7 +96,9 @@ public class MouseLook : MonoBehaviour
         {
             Destroy(Enemy);
             HasKilled = true;
-            
+            //Pass.enabled = false;
+            VaultDoor.Play("Base Layer.Down",0,0);
+            DoorOpens.Play();
         }
         
         if (!Input.GetKey(KeyCode.LeftShift))   //attempt at implementation of shift-to-rocketjump from source in unity
