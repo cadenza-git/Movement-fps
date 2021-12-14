@@ -33,6 +33,7 @@ public class MouseLook : MonoBehaviour
     public int Clips = 8;
     public int Bullets = 10;
     public Collider Pass;
+    private int layerMask;
     
     void Start()
     {
@@ -65,8 +66,8 @@ public class MouseLook : MonoBehaviour
     RaycastHit CastRay()
     {
         RaycastHit hit;
-        Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward),out hit, Mathf.Infinity);
-        return hit;
+        Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward),out hit, Mathf.Infinity, layerMask);
+        return hit; //layerMask makes it so that you cant hit yourself (may revise when doing shooting or something)
     }
     void FixedUpdate()
     {
@@ -84,6 +85,9 @@ public class MouseLook : MonoBehaviour
     }
     void Update()
     {
+        layerMask = 1 << 3;
+        layerMask = ~layerMask;//gives layerMask value of player and then inverts it
+        
         if (Input.GetKey(KeyCode.V))
         {
             Clips = 8;
