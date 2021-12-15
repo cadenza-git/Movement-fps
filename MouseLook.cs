@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MouseLook : MonoBehaviour
 {
@@ -9,6 +12,9 @@ public class MouseLook : MonoBehaviour
     public Transform playerBody;    //Reference to transform of the player "collider", for later use in movement
     public Animator VaultDoor;
     public AudioSource DoorOpens;
+    public Text KillObj;
+    public Text AltObj;
+    public Text ParkObj;
     public float mouseSensitivity = 100.0f; //sens
     public float clampAngle = 87.5f;    //clamp so that player can look further than clampAngle degrees
     private float rotY = 0.0f; 
@@ -33,11 +39,19 @@ public class MouseLook : MonoBehaviour
     public int Clips = 8;
     public int Bullets = 10;
     public Collider Pass;
+    private int DoorMove;
+    public TextMeshPro Text;
     private int layerMask;
+    public bool check1;
+    public bool check2;
+    public bool check3;
+    public GameObject LevelLock;
     
     void Start()
     {
         //sets out variables so that script can access camera rotation and apply them to the player "collider"
+        
+        
         Vector3 rot = transform.localRotation.eulerAngles;
         rotY = rot.y;
         rotX = rot.x;
@@ -67,10 +81,11 @@ public class MouseLook : MonoBehaviour
     {
         RaycastHit hit;
         Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward),out hit, Mathf.Infinity, layerMask);
-        return hit; //layerMask makes it so that you cant hit yourself (may revise when doing shooting or something)
+        return hit; //layermask ignores player verygood
     }
     void FixedUpdate()
     {
+        
         RaycastHit hit;
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, Mathf.Infinity))
         {
@@ -85,8 +100,53 @@ public class MouseLook : MonoBehaviour
     }
     void Update()
     {
+        if(SceneManager.GetActiveScene().buildIndex == 6)
+        {  
+            if(check2)
+            {
+                KillObj.text = "Done. Good";
+            }
+            if(check3)
+            {
+                AltObj.text = "Job Good";
+            }
+            
+            if(check1)
+            {
+                ParkObj.text = "Exercise Done";
+            }
+            
+            if(HasKilled)
+            {   
+                Debug.Log("2 is activated");                
+                check2 = true;
+            }
+            if (check1 && check2 && check3)
+            {
+                LevelLock.GetComponent<Collider>().enabled = false;
+                LevelLock.GetComponent<MeshRenderer>().enabled = false;
+            }
+        }
+        
         layerMask = 1 << 3;
-        layerMask = ~layerMask;//gives layerMask value of player and then inverts it
+        layerMask = ~layerMask;
+        
+        if(SceneManager.GetActiveScene().buildIndex == 5)
+        {
+            if(DoorMove == 2)
+            {
+                VaultDoor.Play("Base Layer.Down",0,0);
+                DoorOpens.Play();
+            
+            }
+            if(DoorMove == 3)
+            {
+                DestroyImmediate(Text);
+            }
+            
+            Text.text = "Kill 3 ye please.         Killed now: " + DoorMove;
+        }
+        
         
         if (Input.GetKey(KeyCode.V))
         {
@@ -101,8 +161,7 @@ public class MouseLook : MonoBehaviour
             Destroy(Enemy);
             HasKilled = true;
             //Pass.enabled = false;
-            VaultDoor.Play("Base Layer.Down",0,0);
-            DoorOpens.Play();
+            DoorMove++;
         }
         
         if (!Input.GetKey(KeyCode.LeftShift))   //attempt at implementation of shift-to-rocketjump from source in unity
@@ -159,6 +218,31 @@ public class MouseLook : MonoBehaviour
         if (Input.GetKey(KeyCode.E))
         {
             RaycastHit hit = CastRay();
+            if(SceneManager.GetActiveScene().buildIndex == 6)
+            {
+                if (hit.distance<5 && hit.collider.name == "Check1")//arbitrary name
+                {   
+                    Debug.Log("1 is activated");
+                    check1 = true;
+                }
+                
+                if (hit.distance<5 && hit.collider.name == "Check2")//arbitrary name
+                {
+                    if(HasKilled)
+                    {
+                        SpawnEnemy();
+                        HasKilled = false;
+                    }   
+                }
+                
+                if (hit.distance<5 && hit.collider.name == "Check3")//arbitrary name
+                {   
+                    Debug.Log("3 is activated");
+                    check3 = true;
+                }
+                
+            }
+            
             if (hit.distance<5 && hit.collider.name == "Interacube")//arbitrary name
             {
                 Debug.Log("Interacted");
@@ -166,7 +250,6 @@ public class MouseLook : MonoBehaviour
                 {
                     SpawnEnemy();
                     HasKilled = false;
-                    
                 }    
                 //else
                 {
