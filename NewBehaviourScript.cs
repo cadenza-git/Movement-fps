@@ -6,14 +6,12 @@ using UnityEngine.SceneManagement;
 public class NewBehaviourScript : MonoBehaviour
 {
     public GameObject CheckSphere;
-    private JumpDetect TellJump;
+    private JumpDetect jumpDetect;
     public AudioSource Feets;
     public AudioSource Fall;
-    public AudioSource Jump;
     public bool JumpAbility = true;
     public float strafe = 50f;
     public float Forward = 75f;
-    public float Jumping = 1000f;
     public float Gravity = 1000f;
     public float CrouchDown = 30f;
     public float AirSpeedNeuter = 1;
@@ -29,7 +27,7 @@ public class NewBehaviourScript : MonoBehaviour
     private int FallDamage;
     private bool HasTurnedOff;
     
-    //CharacterController characterController;
+    
     
     
     private void OnCollisionEnter(Collision collision)
@@ -45,18 +43,16 @@ public class NewBehaviourScript : MonoBehaviour
     
     void Start()
     {
-        TellJump = CheckSphere.GetComponent<JumpDetect>(); //references the current collision status
         Feets.Play();
-        
+        jumpDetect = CheckSphere.GetComponent<JumpDetect>();
         rb = GetComponent<Rigidbody>();
         light.color = newColor;
         
     }
     void Update()
     {
-        JumpAbility = TellJump.CanJump;
         
-        //t += 1f * Time.deltaTime;
+        JumpAbility = jumpDetect.CanJump;
         CurrSpeed = rb.velocity.magnitude;
         SpeedLock = (MaxSpeed - CurrSpeed)/MaxSpeed;
         SpeedLock = Mathf.Clamp(SpeedLock, 0, 100);
@@ -64,6 +60,11 @@ public class NewBehaviourScript : MonoBehaviour
         if(!JumpAbility)
         {
             Feets.volume = 0;
+        }
+        
+        if(Input.GetKey(KeyCode.H))
+        {
+            life = 100;
         }
         
         
@@ -94,12 +95,7 @@ public class NewBehaviourScript : MonoBehaviour
         {
             Application.Quit();
         }
-        if (Input.GetKeyDown(KeyCode.Space) && JumpAbility == true)
-        {
-            rb.AddForce(0, Jumping, 0* Time.deltaTime);
-            Jump.Play();
-            JumpAbility = false;
-        }
+        
         if (Input.GetKey(KeyCode.LeftShift))
         {
             CrouchSpeed = 0.4f;
