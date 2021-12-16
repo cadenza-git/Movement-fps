@@ -46,12 +46,15 @@ public class MouseLook : MonoBehaviour
     public bool check2;
     public bool check3;
     public GameObject LevelLock;
+    public GameObject GetToBox;
     
     void Start()
     {
         //sets out variables so that script can access camera rotation and apply them to the player "collider"
-        
-        
+        if(SceneManager.GetActiveScene().buildIndex == 6)
+        {
+            GetToBox.SetActive(false);
+        }
         Vector3 rot = transform.localRotation.eulerAngles;
         rotY = rot.y;
         rotX = rot.x;
@@ -81,7 +84,7 @@ public class MouseLook : MonoBehaviour
     {
         RaycastHit hit;
         Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward),out hit, Mathf.Infinity, layerMask);
-        return hit; //layermask ignores player verygood
+        return hit;
     }
     void FixedUpdate()
     {
@@ -123,6 +126,8 @@ public class MouseLook : MonoBehaviour
             }
             if (check1 && check2 && check3)
             {
+                
+                GetToBox.SetActive(true);
                 LevelLock.GetComponent<Collider>().enabled = false;
                 LevelLock.GetComponent<MeshRenderer>().enabled = false;
             }
