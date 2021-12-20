@@ -5,11 +5,17 @@ using UnityEngine.SceneManagement;
 
 public class NewBehaviourScript : MonoBehaviour
 {
-    public GameObject CheckSphere;
-    private JumpDetect jumpDetect;
+    [Header("Audio")]
     public AudioSource Feets;
     public AudioSource Fall;
+    
+    [Header("Movement")]
+    public GameObject CheckSphere;
+    private JumpDetect jumpDetect;
     public bool JumpAbility = true;
+    private float SpeedLock;
+    private float StrafeSpeedNeuter;
+    public Rigidbody rb;
     public float strafe = 50f;
     public float Forward = 75f;
     public float Gravity = 1000f;
@@ -18,12 +24,12 @@ public class NewBehaviourScript : MonoBehaviour
     public float CrouchSpeed = 1f;
     public float MaxSpeed = 50f;
     public float CurrSpeed;
+    [Space]
+   	
+    [Header("Life/Damage")]
     public int life = 100;
     public Light light;
     private Color newColor = new Color(0.4179907f,0.2104842f,0.8113208f, 1f);
-    private float SpeedLock;
-    private float StrafeSpeedNeuter;
-    public Rigidbody rb;
     private int FallDamage;
     private bool HasTurnedOff;
     
