@@ -1,0 +1,72 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using UnityEngine.SceneManagement;
+
+public class HitReg : MonoBehaviour
+{
+    
+    public float Health = 100;
+    private float DamageModifier;
+    private int KillCount;
+    public TextMeshPro Text;
+    public AudioSource DoorOpens;
+    public Animator VaultDoor;
+    public bool HasKilled;
+    private int layerMask;
+    
+    RaycastHit CastRay()
+    {
+        RaycastHit hit;
+        Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward),out hit, Mathf.Infinity, layerMask);
+        return hit;
+    }
+    
+    public void HasHit(string HeadInquire, float damage)
+    {
+        
+        
+        if(HeadInquire == "Head")
+        {
+            DamageModifier += 1;
+        }
+        else
+        {
+            DamageModifier = 1;
+        }
+        
+        Health -= damage*DamageModifier;
+        
+    }
+    
+    
+
+    void Update()
+    {
+        layerMask = 1 << 3;
+        layerMask = ~layerMask;
+        
+        if(SceneManager.GetActiveScene().buildIndex == 5)
+        {
+            if(KillCount == 2)
+            {
+                VaultDoor.Play("Base Layer.Down",0,0);
+                DoorOpens.Play();
+            
+            }
+            if(KillCount == 3)
+            {
+                DestroyImmediate(Text);
+            }
+            
+            Text.text = "Kill 3 ye please.         Killed now: " + KillCount;
+        }
+        if(Health <= 0 )
+        {
+            Destroy(gameObject);
+            HasKilled = true;
+            KillCount++;
+        }
+    }
+}
