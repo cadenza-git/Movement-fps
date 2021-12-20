@@ -7,18 +7,30 @@ using UnityEngine.UI;
 
 public class MouseLook : MonoBehaviour
 {
-    
-    public AudioSource shot; //reference audio to play
     public Transform playerBody;    //Reference to transform of the player "collider", for later use in movement
-    public Animator VaultDoor;
+    
+    [Header("Audio/Animation")]
     public AudioSource DoorOpens;
+    public AudioSource shot; //reference audio to play
+    public Animator Gun;
+    public Animator VaultDoor;
+    [Space]
+    
+    [Header("UI/Text")]
     public Text KillObj;
     public Text AltObj;
     public Text ParkObj;
+    public TextMeshPro Text;
+    public GameObject GetToBox;
+    [Space]
+	[Header("Looking")]
     public float mouseSensitivity = 100.0f; //sens
     public float clampAngle = 87.5f;    //clamp so that player can look further than clampAngle degrees
     private float rotY = 0.0f; 
     private float rotX = 0.0f;
+    [Space]
+    
+    [Header("Shooting")]
     //Following variables handle Explosion Instantiation, different variables in the process
     public float BoomStrength = 10.0f;
     public float BoomRadius = 5.0f;
@@ -29,24 +41,31 @@ public class MouseLook : MonoBehaviour
     public Rigidbody Reginald;
     public GameObject Particle;
     public GameObject BoomParticle;
+    private int layerMask;
+    [Space]
+    
+    [Header("Enemies")]
+    
     public int EnemyLife = 10;
     public GameObject Enemy;
     public GameObject NewEnemy;
     private bool HasKilled;
     public RaycastHit Shot;
     public string ShotName;
-    public Animator Gun;
     public int Clips = 8;
     public int Bullets = 10;
+    [Space]
+    
+    [Header("Levels")]
+    
     public Collider Pass;
     private int DoorMove;
-    public TextMeshPro Text;
-    private int layerMask;
     public bool check1;
     public bool check2;
     public bool check3;
-    public GameObject LevelLock;
-    public GameObject GetToBox;
+    public GameObject NextLevelInhibit;
+    
+    
     
     void Start()
     {
@@ -128,8 +147,8 @@ public class MouseLook : MonoBehaviour
             {
                 
                 GetToBox.SetActive(true);
-                LevelLock.GetComponent<Collider>().enabled = false;
-                LevelLock.GetComponent<MeshRenderer>().enabled = false;
+                NextLevelInhibit.GetComponent<Collider>().enabled = false;
+                NextLevelInhibit.GetComponent<MeshRenderer>().enabled = false;
             }
         }
         
