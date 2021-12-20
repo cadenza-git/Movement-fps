@@ -8,6 +8,7 @@ public class NewBehaviourScript : MonoBehaviour
     [Header("Audio")]
     public AudioSource Feets;
     public AudioSource Fall;
+    [Space]
     
     [Header("Movement")]
     public GameObject CheckSphere;
