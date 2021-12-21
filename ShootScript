@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MouseLook : MonoBehaviour
+public class ShootScript : MonoBehaviour
 {
     public Transform playerBody;    //Reference to transform of the player "collider", for later use in movement
     
