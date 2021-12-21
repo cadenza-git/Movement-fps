@@ -1,0 +1,140 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class MouseLook : MonoBehaviour
+{
+    public Transform playerBody;    //Reference to transform of the player "collider", for later use in movement
+    
+    [Header("Audio/Animation")]
+    public AudioSource shot; //reference audio to play
+    public Animator Gun;
+    [Space]
+    
+    [Header("Shooting")]
+    public Transform CameraRot;
+    //Following variables handle Explosion Instantiation, different variables in the process
+    public float BoomStrength = 10.0f;
+    public float BoomRadius = 5.0f;
+    public float BoomLift = 3.0f;
+    public float BoomModifier = 1.75f;
+    public bool canShoot = true;
+    public float coolDown = 5.0f;
+    public Rigidbody Reginald;
+    public GameObject Particle;
+    public GameObject BoomParticle;
+    private int layerMask;
+    [Space]
+    
+    [Header("Enemies")]
+   
+    public GameObject NewEnemy;
+    public RaycastHit Shot;
+    public string ShotName;
+    public int Clips = 8;
+    public int Bullets = 10;
+    [Space]
+    
+    [Header("Levels")]
+    
+    
+    
+    void CooledDown()
+    {
+        //Make it so that can only "shoot" in periods
+        canShoot = true;
+    }
+    
+    void SpawnBoom()
+    {
+        Instantiate(BoomParticle, CastRay().point, Quaternion.Euler(270,0,0));
+        Reginald.AddExplosionForce(BoomStrength * BoomModifier, CastRay().point, BoomRadius, BoomLift * BoomModifier);
+    }
+    
+    RaycastHit CastRay()
+    {
+        RaycastHit hit;
+        Physics.Raycast(CameraRot.position, CameraRot.TransformDirection(Vector3.forward),out hit, Mathf.Infinity, layerMask);
+        return hit;
+    }
+    void FixedUpdate()
+    {
+        
+        RaycastHit hit;
+        if (Physics.Raycast(CameraRot.position, CameraRot.TransformDirection(Vector3.forward), out hit, Mathf.Infinity))
+        {
+            Debug.DrawRay(CameraRot.position, CameraRot.TransformDirection(Vector3.forward) * hit.distance, Color.red);
+            
+        }
+        else
+        {
+            Debug.DrawRay(CameraRot.position, CameraRot.TransformDirection(Vector3.forward) * 1000, Color.white);
+            
+        }
+    }
+    void Update()
+    {
+        
+        layerMask = 1 << 3;
+        layerMask = ~layerMask;
+        
+        
+        
+        
+        if (Input.GetKey(KeyCode.V))
+        {
+            Clips = 8;
+        }
+        
+        
+        if (!Input.GetKey(KeyCode.LeftShift))   //attempt at implementation of shift-to-rocketjump from source in unity
+        {
+            BoomModifier = 1.0f;
+        }
+        else
+        {
+            BoomModifier = 1.75f;
+        }
+        
+        if (Input.GetKeyDown(KeyCode.R) && !(Gun.GetCurrentAnimatorStateInfo(0).IsName("reload")) && Clips > 0)
+        {
+            Gun.Play("Base Layer.reload",0,0);
+            Clips--;
+            Bullets = 10;
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            if (Gun != null && Bullets > 0)
+            {  
+                
+                Shot = CastRay();
+                ShotName = Shot.collider.name;
+                Gun.Play("Base Layer.Yes",0,0);
+                Bullets--;
+                Instantiate(Particle, Shot.point, Quaternion.identity);
+                if (!shot.isPlaying)
+                {
+                    shot.Play();
+                }   
+                if (Input.GetKeyDown(KeyCode.R) && !(Gun.GetCurrentAnimatorStateInfo(0).IsName("reload")) && Clips > 0)
+                {
+                    Gun.Play("Base Layer.reload",0,0);
+                    Clips--;
+                    Bullets = 10;
+                }
+            }
+        }
+        
+        if (Input.GetKey(KeyCode.Mouse1) && canShoot)
+        {
+            SpawnBoom();
+            canShoot = false;
+            Invoke("CooledDown", coolDown);
+            //"Rocket Jumping" can only shoot every specific time period
+        }
+    }
+}
