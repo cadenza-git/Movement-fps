@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class MouseLook : MonoBehaviour
 {
@@ -110,22 +108,18 @@ public class MouseLook : MonoBehaviour
         {
             if (Gun != null && Bullets > 0)
             {  
-                
                 Shot = CastRay();
                 ShotName = Shot.collider.name;
+                HitRegScript = Shot.collider.GetComponent<HitReg>();
+                
                 Gun.Play("Base Layer.Yes",0,0);
                 Bullets--;
-                Instantiate(Particle, Shot.point, Quaternion.identity);
                 if (!shot.isPlaying)
                 {
                     shot.Play();
-                }   
-                if (Input.GetKeyDown(KeyCode.R) && !(Gun.GetCurrentAnimatorStateInfo(0).IsName("reload")) && Clips > 0)
-                {
-                    Gun.Play("Base Layer.reload",0,0);
-                    Clips--;
-                    Bullets = 10;
                 }
+                HitRegScript.HasHit(ShotName, damage);
+                Instantiate(Particle, Shot.point, Quaternion.LookRotation(Shot.normal) );
             }
         }
         
