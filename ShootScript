@@ -34,9 +34,6 @@ public class ShootScript : MonoBehaviour
     public string ShotName;
     public int Clips = 8;
     public int Bullets = 10;
-    [Space]
-    
-    [Header("Levels")]
     
     
     
