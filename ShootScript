@@ -19,12 +19,14 @@ public class ShootScript : MonoBehaviour
     public float BoomRadius = 5.0f;
     public float BoomLift = 3.0f;
     public float BoomModifier = 1.75f;
+    public float BoomLiftModifier = 1.4f;
     public bool canShoot = true;
     public float coolDown = 5.0f;
     public Rigidbody Reginald;
     public GameObject Particle;
     public GameObject BoomParticle;
     private int layerMask;
+    private HitReg HitRegScript;
     [Space]
     
     [Header("Enemies")]
@@ -34,6 +36,7 @@ public class ShootScript : MonoBehaviour
     public string ShotName;
     public int Clips = 8;
     public int Bullets = 10;
+    public float damage = 10f;
     
     
     
@@ -46,7 +49,7 @@ public class ShootScript : MonoBehaviour
     void SpawnBoom()
     {
         Instantiate(BoomParticle, CastRay().point, Quaternion.Euler(270,0,0));
-        Reginald.AddExplosionForce(BoomStrength * BoomModifier, CastRay().point, BoomRadius, BoomLift * BoomModifier);
+        Reginald.AddExplosionForce(BoomStrength * BoomModifier, CastRay().point, BoomRadius, BoomLift * (BoomModifier ) );
     }
     
     RaycastHit CastRay()
@@ -88,10 +91,12 @@ public class ShootScript : MonoBehaviour
         if (!Input.GetKey(KeyCode.LeftShift))   //attempt at implementation of shift-to-rocketjump from source in unity
         {
             BoomModifier = 1.0f;
+            BoomLiftModifier = 1.0f;
         }
         else
         {
             BoomModifier = 1.75f;
+            BoomLiftModifier = 1.3f;
         }
         
         if (Input.GetKeyDown(KeyCode.R) && !(Gun.GetCurrentAnimatorStateInfo(0).IsName("reload")) && Clips > 0)
@@ -105,9 +110,6 @@ public class ShootScript : MonoBehaviour
         {
             if (Gun != null && Bullets > 0)
             {  
-                Shot = CastRay();
-                ShotName = Shot.collider.name;
-                HitRegScript = Shot.collider.GetComponent<HitReg>();
                 
                 Gun.Play("Base Layer.Yes",0,0);
                 Bullets--;
@@ -115,8 +117,16 @@ public class ShootScript : MonoBehaviour
                 {
                     shot.Play();
                 }
-                HitRegScript.HasHit(ShotName, damage);
+                
+                Shot = CastRay();
+                ShotName = Shot.collider.name;
                 Instantiate(Particle, Shot.point, Quaternion.LookRotation(Shot.normal) );
+                HitRegScript = Shot.collider.GetComponentInParent<HitReg>();
+                if(HitRegScript != null)
+                {
+                    HitRegScript.HasHit(ShotName, damage);
+                }
+                
             }
         }
         
