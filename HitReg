@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
-using UnityEngine.SceneManagement;
+
 
 public class HitReg : MonoBehaviour
 {
     
     public float Health = 100;
     private float DamageModifier;
+    public GameObject cam;
+    private MouseLook MoLook;
+    
     
     public void HasHit(string HeadInquire, float damage)
     {
@@ -16,7 +18,7 @@ public class HitReg : MonoBehaviour
         
         if(HeadInquire == "Head")
         {
-            DamageModifier += 1;
+            DamageModifier += 1.5f;
         }
         else
         {
@@ -27,4 +29,19 @@ public class HitReg : MonoBehaviour
         
     }
     
+    void Start()
+    {
+        MoLook = cam.GetComponent<MouseLook>();
+    }
+
+    void Update()
+    {
+        
+        
+        if(Health <= 0 )
+        {
+            MoLook.OnDeath();
+            Destroy(gameObject);
+        }
+    }
 }
