@@ -64,8 +64,8 @@ public class NewBehaviourScript : MonoBehaviour
     }
     
     
-    bool CheckStep()
-    {
+    bool CheckStep() //sends one raycast at bottom of player, then another higher up, 
+    { //if bottom is true and top is false, step is recognised and player is pushed up
         bool IsStep;
         RaycastHit hit;
         if(Physics.Raycast( new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.forward), out hit, 0.97f))
