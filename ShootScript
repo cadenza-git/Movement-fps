@@ -72,6 +72,10 @@ public class ShootScript : MonoBehaviour
             Debug.DrawRay(CameraRot.position, CameraRot.TransformDirection(Vector3.forward) * 1000, Color.white);
             
         }
+        
+        Debug.DrawRay(new Vector3 (playerBody.position.x,playerBody.position.y-0.45f,playerBody.position.z), playerBody.TransformDirection(Vector3.forward)*0.9f, Color.blue);
+        Debug.DrawRay(new Vector3 (playerBody.position.x,playerBody.position.y-0.95f,playerBody.position.z), playerBody.TransformDirection(Vector3.forward)*0.9f, Color.blue);
+        
     }
     void Update()
     {
