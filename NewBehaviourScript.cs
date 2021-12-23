@@ -14,7 +14,7 @@ public class NewBehaviourScript : MonoBehaviour
     public GameObject CheckSphere;
     private JumpDetect jumpDetect;
     public bool JumpAbility = true;
-    private float SpeedLock;
+    public float SpeedLock;
     private float StrafeSpeedNeuter;
     public Rigidbody rb;
     public float strafe = 50f;
@@ -25,6 +25,7 @@ public class NewBehaviourScript : MonoBehaviour
     public float CrouchSpeed = 1f;
     public float MaxSpeed = 50f;
     public float CurrSpeed;
+    public float StepHeight = 0.5f;
     [Space]
    	
     [Header("Life/Damage")]
@@ -33,9 +34,62 @@ public class NewBehaviourScript : MonoBehaviour
     private Color newColor = new Color(0.4179907f,0.2104842f,0.8113208f, 1f);
     private int FallDamage;
     private bool HasTurnedOff;
+    public GameObject Enemy;
     
     
+    public bool CheckWallRun()
+    {
+        bool CanWallRun;
+        RaycastHit hit;
+        if(Physics.Raycast( new Vector3(transform.position.x,transform.position.y+0.95f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) || Physics.Raycast( new Vector3(transform.position.x,transform.position.y+0.95f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) )
+        {
+            if(Physics.Raycast(new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) || Physics.Raycast(new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) )
+            {
+                CanWallRun = true;
+                
+            }
+            else
+            {
+                CanWallRun = false;
+            }
+        }
+        else
+        {
+            CanWallRun = false;
+        }
+        
+        
+        return CanWallRun;
+        
+    }
     
+    
+    bool CheckStep()
+    {
+        bool IsStep;
+        RaycastHit hit;
+        if(Physics.Raycast( new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.forward), out hit, 0.97f))
+        {
+            if(Physics.Raycast(new Vector3(transform.position.x,transform.position.y-0.95f+StepHeight,transform.position.z ), transform.TransformDirection(Vector3.forward), out hit, 0.97f))
+            {
+                IsStep = false;
+                
+            }
+            else
+            {
+                IsStep = true;
+            }
+        }
+        else
+        {
+            IsStep = false;
+        }
+        
+        
+        return IsStep;
+        
+        
+    }
     
     private void OnCollisionEnter(Collision collision)
     {
@@ -58,11 +112,20 @@ public class NewBehaviourScript : MonoBehaviour
     }
     void Update()
     {
-        
         JumpAbility = jumpDetect.CanJump;
         CurrSpeed = rb.velocity.magnitude;
         SpeedLock = (MaxSpeed - CurrSpeed)/MaxSpeed;
-        SpeedLock = Mathf.Clamp(SpeedLock, 0, 100);
+        SpeedLock = Mathf.Clamp(SpeedLock, 0.15f, 100);
+        
+        
+        if(SceneManager.GetActiveScene().buildIndex == 7)
+        {
+            if(Input.GetKey(KeyCode.E))
+            {
+                Instantiate(Enemy, new Vector3(0,0,0), Quaternion.identity );
+            }
+        }
+        
         Feets.volume = 1-SpeedLock;
         if(!JumpAbility)
         {
@@ -116,6 +179,16 @@ public class NewBehaviourScript : MonoBehaviour
     void FixedUpdate()
     {
         
+            
+        if(CheckStep() && (Input.GetKey(KeyCode.W))) //Step Controller
+        {
+            Debug.Log("Step");
+            rb.AddForce(0,270,0);
+            rb.AddRelativeForce(-Vector3.forward * (135*CrouchSpeed *AirSpeedNeuter));
+            AirSpeedNeuter = 0.1f;
+            
+        }
+        
         
         if (JumpAbility != true)
         {
@@ -127,6 +200,7 @@ public class NewBehaviourScript : MonoBehaviour
             AirSpeedNeuter = 1f;
             StrafeSpeedNeuter = 1f;
         }
+        
         
         if(Input.GetKey(KeyCode.A))
         {
