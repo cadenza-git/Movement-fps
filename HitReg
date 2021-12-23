@@ -40,7 +40,7 @@ public class HitReg : MonoBehaviour
         
         if(Health <= 0 )
         {
-            MoLook.OnDeath();
+            //MoLook.OnDeath();
             Destroy(gameObject);
         }
     }
