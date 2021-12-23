@@ -44,7 +44,7 @@ public class NewBehaviourScript : MonoBehaviour
         if(Physics.Raycast( new Vector3(transform.position.x,transform.position.y+0.95f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) || Physics.Raycast( new Vector3(transform.position.x,transform.position.y+0.95f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) )
         {
             if(Physics.Raycast(new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) || Physics.Raycast(new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) )
-            {
+            { //^checks left and right of playe for specific distance and sets varable true to be accessed by different script
                 CanWallRun = true;
                 
             }
