@@ -8,7 +8,7 @@ public class HitReg : MonoBehaviour
     
     public float Health = 100;
     private float DamageModifier;
-    public GameObject cam;
+    public GameObject player;
     private MouseLook MoLook;
     
     
@@ -31,7 +31,7 @@ public class HitReg : MonoBehaviour
     
     void Start()
     {
-        MoLook = cam.GetComponent<MouseLook>();
+        MoLook = player.GetComponentInChildren<MouseLook>();
     }
 
     void Update()
@@ -40,7 +40,7 @@ public class HitReg : MonoBehaviour
         
         if(Health <= 0 )
         {
-            //MoLook.OnDeath();
+            MoLook.OnDeath();
             Destroy(gameObject);
         }
     }
