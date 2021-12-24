@@ -26,6 +26,7 @@ public class NewBehaviourScript : MonoBehaviour
     public float MaxSpeed = 50f;
     public float CurrSpeed;
     public float StepHeight = 0.5f;
+    private float WallStrafeNeuter = 1.0f;
     [Space]
    	
     [Header("Life/Damage")]
@@ -39,13 +40,14 @@ public class NewBehaviourScript : MonoBehaviour
     
     public bool CheckWallRun()
     {
-        bool CanWallRun;
         RaycastHit hit;
-        if(Physics.Raycast( new Vector3(transform.position.x,transform.position.y+0.95f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) || Physics.Raycast( new Vector3(transform.position.x,transform.position.y+0.95f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) )
+        bool CanWallRun;
+        if(Physics.Raycast( new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) || Physics.Raycast( new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) )
         {
-            if(Physics.Raycast(new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) || Physics.Raycast(new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) )
-            { //^checks left and right of playe for specific distance and sets varable true to be accessed by different script
+            if(Physics.Raycast(new Vector3(transform.position.x,transform.position.y+0.1f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) || Physics.Raycast(new Vector3(transform.position.x,transform.position.y+0.1f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) )
+            {
                 CanWallRun = true;
+                
                 
             }
             else
@@ -56,6 +58,7 @@ public class NewBehaviourScript : MonoBehaviour
         else
         {
             CanWallRun = false;
+        	    
         }
         
         
@@ -63,9 +66,30 @@ public class NewBehaviourScript : MonoBehaviour
         
     }
     
+    public string CheckWallRunSide()
+    {
+        RaycastHit hit;
+        string WallRunSide;
+        if(Physics.Raycast( new Vector3(transform.position.x,transform.position.y+0.95f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) && Physics.Raycast(new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) )
+        {
+            WallRunSide = "left";
+            return WallRunSide;
+        }
+        if(Physics.Raycast( new Vector3(transform.position.x,transform.position.y+0.95f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) && Physics.Raycast(new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) )
+        {
+            WallRunSide = "right";
+            return WallRunSide;
+        }
+        else
+        {
+            WallRunSide = "null";
+        }
+        return WallRunSide;
+    }
     
-    bool CheckStep() //sends one raycast at bottom of player, then another higher up, 
-    { //if bottom is true and top is false, step is recognised and player is pushed up
+    
+    bool CheckStep()
+    {
         bool IsStep;
         RaycastHit hit;
         if(Physics.Raycast( new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.forward), out hit, 0.97f))
@@ -153,6 +177,9 @@ public class NewBehaviourScript : MonoBehaviour
             case int n when (n <= 80 && n <= 61):
                 light.color= Color.magenta;
                 break;
+            case int n when (n<=100):
+                light.color = newColor;
+                break;
         }
             
             
@@ -168,18 +195,24 @@ public class NewBehaviourScript : MonoBehaviour
         
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            CrouchSpeed = 0.4f;
+            CrouchSpeed = 0.35f;
         }
         else
         {
             CrouchSpeed = 1f;
         }
     }
-    // Update is called once per frame
     void FixedUpdate()
     {
+        if(CheckWallRun())
+        {
+            WallStrafeNeuter = 0.5f;
+        }
+        else
+        {
+            WallStrafeNeuter = 1.0f;
+        }
         
-            
         if(CheckStep() && (Input.GetKey(KeyCode.W))) //Step Controller
         {
             Debug.Log("Step");
@@ -204,7 +237,7 @@ public class NewBehaviourScript : MonoBehaviour
         
         if(Input.GetKey(KeyCode.A))
         {
-            rb.AddRelativeForce(-strafe * StrafeSpeedNeuter * SpeedLock * CrouchSpeed,0,0 * Time.deltaTime);
+            rb.AddRelativeForce(-strafe * WallStrafeNeuter * StrafeSpeedNeuter * SpeedLock * CrouchSpeed,0,0 * Time.deltaTime);
         }
         
         if (Input.GetKey(KeyCode.S))
@@ -222,7 +255,7 @@ public class NewBehaviourScript : MonoBehaviour
         
         if (Input.GetKey(KeyCode.D))
         {
-            rb.AddRelativeForce(strafe * StrafeSpeedNeuter * SpeedLock * CrouchSpeed,0,0 * Time.deltaTime);
+            rb.AddRelativeForce(strafe * WallStrafeNeuter * StrafeSpeedNeuter * SpeedLock * CrouchSpeed,0,0 * Time.deltaTime);
             
         }
         if (Input.GetKey(KeyCode.LeftShift))
