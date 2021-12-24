@@ -27,19 +27,26 @@ public class MouseLook : MonoBehaviour
     public float clampAngle = 87.5f;    //clamp so that player can look further than clampAngle degrees
     private float rotY = 0.0f; 
     private float rotX = 0.0f;
+    public GameObject CheckSphere;
+    private JumpDetect jumpDetect;
+    private bool LeanCamera;
+    private float LeanAmount = 0.0f;
+    private Camera camera;
     [Space]
     
     
     [Header("Enemies")]
 
     public GameObject NewEnemy;
+    private bool HasKilled;
+    private int layerMask;
   
     [Space]
     
     [Header("Levels")]
     
     public Collider Pass;
-    private int DoorMove;
+    public int DoorMove;
     public bool check1;
     public bool check2;
     public bool check3;
@@ -49,6 +56,10 @@ public class MouseLook : MonoBehaviour
     
     void Start()
     {
+        jumpDetect = CheckSphere.GetComponent<JumpDetect>();
+        
+        camera = GetComponent<Camera>();
+        
         //sets out variables so that script can access camera rotation and apply them to the player "collider"
         if(SceneManager.GetActiveScene().buildIndex == 6)
         {
@@ -64,9 +75,7 @@ public class MouseLook : MonoBehaviour
     void SpawnEnemy()
     {
         
-        EnemyLife = 10;
         Instantiate(NewEnemy, new Vector3(47.85f, -7.45f, -32.56f),  Quaternion.identity);
-        Enemy = GameObject.Find("Capsule(Clone)");
         
     }
     
@@ -78,6 +87,11 @@ public class MouseLook : MonoBehaviour
         return hit;
     }
     
+    public void OnDeath()
+    {
+        DoorMove++;
+    }
+    
     void Update()
     {
     	float mouseX = Input.GetAxis("Mouse X");    //Gets mouse input
@@ -85,44 +99,43 @@ public class MouseLook : MonoBehaviour
         rotY += mouseX * mouseSensitivity * Time.deltaTime; //Can use mouse input to affect camera  
         rotX += mouseY * mouseSensitivity * Time.deltaTime; 
         rotX = Mathf.Clamp(rotX, -clampAngle, clampAngle);  //Applies the clamping 
-        Quaternion localRotation = Quaternion.Euler(rotX, rotY, 0.0f); //Applies rotation to camera
+        Quaternion localRotation = Quaternion.Euler(rotX, rotY, LeanAmount); //Applies rotation to camera
         transform.rotation = localRotation;
         Vector3 eulerRotation = new Vector3(playerBody.transform.eulerAngles.x, transform.eulerAngles.y, playerBody.transform.eulerAngles.z );
         //^This applies the y rotation to the player so that forces can be applied in same direction as camera
         playerBody.rotation = Quaternion.Euler(eulerRotation);
-	
-        if(SceneManager.GetActiveScene().buildIndex == 6)
-        {  
-            if(check2)
+
+        if(jumpDetect.TellCameraLean)
+        {
+            camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, 141.5f, 0.2f);
+        }
+        else if(!jumpDetect.TellCameraLean)
+        {
+            camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, 130f, 0.2f);
+        }
+
+
+        LeanCamera = jumpDetect.TellCameraLean;
+        if(LeanCamera)
+        {
+            if(jumpDetect.SideOfWallRun == "left")
             {
-                KillObj.text = "Done. Good";
+                LeanAmount = Mathf.Lerp(LeanAmount, -11.5f, 0.25f);
             }
-            if(check3)
-            {
-                AltObj.text = "Job Good";
-            }
-            
-            if(check1)
-            {
-                ParkObj.text = "Exercise Done";
-            }
-            
-            if(HasKilled)
-            {   
-                Debug.Log("2 is activated");                
-                check2 = true;
-            }
-            if (check1 && check2 && check3)
+            else if(jumpDetect.SideOfWallRun == "right")
             {
                 
-                GetToBox.SetActive(true);
-                NextLevelInhibit.GetComponent<Collider>().enabled = false;
-                NextLevelInhibit.GetComponent<MeshRenderer>().enabled = false;
+               LeanAmount = Mathf.Lerp(LeanAmount, 11.5f, 0.25f);
+                
             }
+
+
+
         }
-        
-        layerMask = 1 << 3;
-        layerMask = ~layerMask;
+        else
+        {
+            LeanAmount = 0.0f;
+        }
         
         if(SceneManager.GetActiveScene().buildIndex == 5)
         {
@@ -140,7 +153,42 @@ public class MouseLook : MonoBehaviour
             Text.text = "Kill 3 ye please.         Killed now: " + DoorMove;
         }
         
-        if (Input.GetKey(KeyCode.E))
+        layerMask = 1 << 3;
+        layerMask = ~layerMask;
+        
+	
+        if(SceneManager.GetActiveScene().buildIndex == 6)
+        {  
+            if(check2)
+            {
+                KillObj.text = "Done. Good";
+            }
+            if(check3)
+            {
+                AltObj.text = "Job Good";
+            }
+            
+            if(check1)
+            {
+                ParkObj.text = "Exercise Done";
+            }
+            
+            if(DoorMove >= 0)
+            {   
+                Debug.Log("2 is activated");                
+                check2 = true;
+            }
+            if (check1 && check2 && check3)
+            {
+                
+                GetToBox.SetActive(true);
+                NextLevelInhibit.GetComponent<Collider>().enabled = false;
+                NextLevelInhibit.GetComponent<MeshRenderer>().enabled = false;
+            }
+        }
+        
+        
+        if (Input.GetKeyDown(KeyCode.E))
         {
             RaycastHit hit = CastRay();
             if(SceneManager.GetActiveScene().buildIndex == 6)
@@ -171,16 +219,8 @@ public class MouseLook : MonoBehaviour
             if (hit.distance<5 && hit.collider.name == "Interacube")//arbitrary name
             {
                 Debug.Log("Interacted");
-                if(HasKilled)
-                {
-                    SpawnEnemy();
-                    HasKilled = false;
-                }    
-                //else
-                {
-                    
-                    
-                }
+                SpawnEnemy();  
+                
             }
         }
     }
