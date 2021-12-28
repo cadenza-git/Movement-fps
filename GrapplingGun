@@ -1,45 +1,109 @@
 using UnityEngine;
 
-public class GrapplingGun : MonoBehaviour {
+public class Grapple : MonoBehaviour {
 
     private LineRenderer lr;
     private Vector3 grapplePoint;
     public LayerMask whatIsGrappleable;
     public Camera CameraFOV;
     public Transform gunTip, camera, player;
-    private float maxDistance = 100f;
+    private float maxDistance = 6000f;
+    public bool IsCurrGrappling = false;
     private SpringJoint joint;
+    public float PullPower;
+    public GameObject CheckSphere;
+    private JumpDetect IsOnGroundScript;
+    private bool IsGrounded;
+    private float GrappMod;
     // full credit to dani for providing the only working script....
     // because im lazy obviously
     // https://github.com/DaniDevy/FPS_Movement_Rigidbody/blob/master/GrapplingGun.cs
     public Rigidbody rb;
+    public float JointSpring;
+    public float JointDamper;
+    public float JointMass;
+    public Vector3 VectorDistance;
+    private int layerMask;
+    private bool grappleAir;
+
+
+    void OnCollisionEnter()
+    {
+        grappleAir = false;
+    }
 
     void Awake() {
+        IsOnGroundScript = CheckSphere.GetComponent<JumpDetect>();
         lr = GetComponent<LineRenderer>();
     }
 
+    void ApplyGrappleForce()
+    {
+        VectorDistance.x = ((player.position.x - grapplePoint.x) * PullPower);
+        VectorDistance.y = ((player.position.y - grapplePoint.y) * PullPower);
+        VectorDistance.z = ((player.position.z - grapplePoint.z) * PullPower);
+
+        if(IsCurrGrappling)
+        {
+            rb.AddForce(-VectorDistance * Time.deltaTime * GrappMod); 
+        }
+        else
+        {
+            VectorDistance.x = 0.0f;
+            VectorDistance.y = 0.0f;
+            VectorDistance.z = 0.0f;
+        }
+    }
+
     void Update() {
+
+        if(IsOnGroundScript.CanJump)
+        {
+            GrappMod = 0.1f;
+        }
+        else
+        {
+            GrappMod = 0.7f;
+        }
+        layerMask = 1 << 3;
+        layerMask = ~layerMask;
+
+
         if (Input.GetMouseButtonDown(0)) 
         {
             StartGrapple();
+            grappleAir = true;
+            
+                        
         }
         else if (Input.GetMouseButtonUp(0)) 
         {
             StopGrapple();
             
-            rb.AddRelativeForce(0,500,500);
+            ApplyGrappleForce();
         }
+
+        if(grappleAir)
+        {
+            rb.drag = 0.47f;
+        }
+        else
+        {
+            rb.drag = 1f;
+        }
+
     }
 
     
     void LateUpdate() {
         DrawRope();
+        ApplyGrappleForce();
     }
 
     
     void StartGrapple() {
         RaycastHit hit;
-        if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, whatIsGrappleable)) {
+        if (Physics.Raycast(camera.position, camera.forward, out hit, maxDistance, layerMask)) {
             grapplePoint = hit.point;
             joint = player.gameObject.AddComponent<SpringJoint>();
             joint.autoConfigureConnectedAnchor = false;
@@ -48,22 +112,27 @@ public class GrapplingGun : MonoBehaviour {
             float distanceFromPoint = Vector3.Distance(player.position, grapplePoint);
 
             //The distance grapple will try to keep from grapple point. 
-            joint.maxDistance = distanceFromPoint * 0.8f;
-            joint.minDistance = distanceFromPoint * 0.25f;
+            joint.maxDistance = distanceFromPoint * 0.001f;
+            joint.minDistance = distanceFromPoint * 0.0f;
+            joint.tolerance = 0.1f;
 
             //Adjust these values to fit your game.
             joint.spring = 70f;
             joint.damper = 700f;
-            joint.massScale = 100000.5f;
+           
+
+            
 
             lr.positionCount = 2;
             currentGrapplePosition = gunTip.position;
+            IsCurrGrappling = true;
         }
     }
 
 
     void StopGrapple() {
         lr.positionCount = 0;
+        IsCurrGrappling = false;
         Destroy(joint);
     }
 
