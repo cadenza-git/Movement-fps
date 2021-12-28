@@ -8,7 +8,9 @@ using UnityEngine.UI;
 public class MouseLook : MonoBehaviour
 {
     public Transform playerBody;    //Reference to transform of the player "collider", for later use in movement
-    
+    public Grapple GrappleScript;
+    private bool IsGrappling;
+
     [Header("Audio/Animation")]
     public AudioSource DoorOpens;
     public Animator VaultDoor;
@@ -56,6 +58,7 @@ public class MouseLook : MonoBehaviour
     
     void Start()
     {
+
         jumpDetect = CheckSphere.GetComponent<JumpDetect>();
         
         camera = GetComponent<Camera>();
@@ -92,9 +95,9 @@ public class MouseLook : MonoBehaviour
         DoorMove++;
     }
     
-    void Update()
+    void LateUpdate()
     {
-    	float mouseX = Input.GetAxis("Mouse X");    //Gets mouse input
+        float mouseX = Input.GetAxis("Mouse X");    //Gets mouse input
         float mouseY = -Input.GetAxis("Mouse Y");
         rotY += mouseX * mouseSensitivity * Time.deltaTime; //Can use mouse input to affect camera  
         rotX += mouseY * mouseSensitivity * Time.deltaTime; 
@@ -104,12 +107,21 @@ public class MouseLook : MonoBehaviour
         Vector3 eulerRotation = new Vector3(playerBody.transform.eulerAngles.x, transform.eulerAngles.y, playerBody.transform.eulerAngles.z );
         //^This applies the y rotation to the player so that forces can be applied in same direction as camera
         playerBody.rotation = Quaternion.Euler(eulerRotation);
+    }
 
-        if(jumpDetect.TellCameraLean)
+
+    void Update()
+    {
+    	
+
+        IsGrappling = GrappleScript.IsCurrGrappling;
+
+
+        if(jumpDetect.TellCameraLean || IsGrappling)
         {
             camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, 141.5f, 0.2f);
         }
-        else if(!jumpDetect.TellCameraLean)
+        else if(!jumpDetect.TellCameraLean || !IsGrappling)
         {
             camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, 130f, 0.2f);
         }
