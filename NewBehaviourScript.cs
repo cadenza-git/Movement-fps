@@ -27,6 +27,9 @@ public class NewBehaviourScript : MonoBehaviour
     public float CurrSpeed;
     public float StepHeight = 0.5f;
     private float WallStrafeNeuter = 1.0f;
+    private bool IsGrapp;
+    private float GrappleSpeedNeuter = 1.0f;
+    private Collider PlayerColl;
     [Space]
    	
     [Header("Life/Damage")]
@@ -44,7 +47,7 @@ public class NewBehaviourScript : MonoBehaviour
         bool CanWallRun;
         if(Physics.Raycast( new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) || Physics.Raycast( new Vector3(transform.position.x,transform.position.y-0.95f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) )
         {
-            if(Physics.Raycast(new Vector3(transform.position.x,transform.position.y+0.1f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) || Physics.Raycast(new Vector3(transform.position.x,transform.position.y+0.1f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) )
+            if(Physics.Raycast(new Vector3(transform.position.x,transform.position.y-0.1f,transform.position.z ), transform.TransformDirection(Vector3.left), out hit, 1.5f) || Physics.Raycast(new Vector3(transform.position.x,transform.position.y-0.1f,transform.position.z ), transform.TransformDirection(Vector3.right), out hit, 1.5f) )
             {
                 CanWallRun = true;
                 
@@ -125,9 +128,24 @@ public class NewBehaviourScript : MonoBehaviour
             life = life-FallDamage;
         }
     }
+
+    void Slide()
+    {
+        PlayerColl.material.dynamicFriction = 0.0f;
+        PlayerColl.material.staticFriction = 0.0f;
+        rb.AddForce(0,250*Time.deltaTime,0);
+    }
+    void StopSlide()
+    {
+        PlayerColl.material.dynamicFriction = 0.7f;
+        PlayerColl.material.staticFriction = 0.7f;
+    }
     
     void Start()
     {
+
+        PlayerColl = GetComponent<Collider>();
+
         Feets.Play();
         jumpDetect = CheckSphere.GetComponent<JumpDetect>();
         rb = GetComponent<Rigidbody>();
@@ -137,6 +155,7 @@ public class NewBehaviourScript : MonoBehaviour
     void Update()
     {
         JumpAbility = jumpDetect.CanJump;
+        IsGrapp = gameObject.GetComponent<Grapple>().IsCurrGrappling;
         CurrSpeed = rb.velocity.magnitude;
         SpeedLock = (MaxSpeed - CurrSpeed)/MaxSpeed;
         SpeedLock = Mathf.Clamp(SpeedLock, 0.15f, 100);
@@ -149,7 +168,7 @@ public class NewBehaviourScript : MonoBehaviour
                 Instantiate(Enemy, new Vector3(0,0,0), Quaternion.identity );
             }
         }
-        
+
         Feets.volume = 1-SpeedLock;
         if(!JumpAbility)
         {
@@ -195,18 +214,20 @@ public class NewBehaviourScript : MonoBehaviour
         
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            CrouchSpeed = 0.35f;
+            CrouchSpeed = 0.1f;
+            Slide();
         }
         else
         {
             CrouchSpeed = 1f;
+            StopSlide();
         }
     }
     void FixedUpdate()
     {
         if(CheckWallRun())
         {
-            WallStrafeNeuter = 0.5f;
+            WallStrafeNeuter = 0.3f;
         }
         else
         {
@@ -233,20 +254,28 @@ public class NewBehaviourScript : MonoBehaviour
             AirSpeedNeuter = 1f;
             StrafeSpeedNeuter = 1f;
         }
+        if(IsGrapp)
+        {
+            GrappleSpeedNeuter = 1.7f;
+        }
+        else
+        {
+            GrappleSpeedNeuter = 1f;
+        }
         
         
         if(Input.GetKey(KeyCode.A))
         {
-            rb.AddRelativeForce(-strafe * WallStrafeNeuter * StrafeSpeedNeuter * SpeedLock * CrouchSpeed,0,0 * Time.deltaTime);
+            rb.AddRelativeForce(-strafe *GrappleSpeedNeuter * WallStrafeNeuter * StrafeSpeedNeuter * SpeedLock * CrouchSpeed,0,0 * Time.deltaTime);
         }
         
         if (Input.GetKey(KeyCode.S))
         {
-            rb.AddRelativeForce(0,0,-Forward * SpeedLock * AirSpeedNeuter * CrouchSpeed);
+            rb.AddRelativeForce(0,0,-Forward *GrappleSpeedNeuter * SpeedLock * AirSpeedNeuter * CrouchSpeed);
         }
         if (Input.GetKey(KeyCode.W))
         {
-            rb.AddRelativeForce( 0 , 0 , Forward * SpeedLock * AirSpeedNeuter * CrouchSpeed);
+            rb.AddRelativeForce( 0 , 0 , Forward *GrappleSpeedNeuter * SpeedLock * AirSpeedNeuter * CrouchSpeed);
         }
         if (Input.GetKey(KeyCode.M))
         {
@@ -255,12 +284,12 @@ public class NewBehaviourScript : MonoBehaviour
         
         if (Input.GetKey(KeyCode.D))
         {
-            rb.AddRelativeForce(strafe * WallStrafeNeuter * StrafeSpeedNeuter * SpeedLock * CrouchSpeed,0,0 * Time.deltaTime);
+            rb.AddRelativeForce(strafe *GrappleSpeedNeuter * WallStrafeNeuter * StrafeSpeedNeuter * SpeedLock * CrouchSpeed,0,0 * Time.deltaTime);
             
         }
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            rb.AddRelativeForce(0,-CrouchDown,0);
+            //rb.AddRelativeForce(0,-CrouchDown,0);
         }
         
         rb.AddForce(0,-Gravity,0);
